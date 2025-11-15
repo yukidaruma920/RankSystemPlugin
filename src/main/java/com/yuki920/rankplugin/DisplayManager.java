@@ -1,4 +1,4 @@
-package com.example.rankplugin;
+package com.yuki920.rankplugin;
 
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
