@@ -24,7 +24,7 @@ repositories {
 dependencies {
     paperweight.paperDevBundle('1.21.3-R0.1-SNAPSHOT')
     
-    // LuckPerms API
+    // LuckPerms API - 最新版を使用
     compileOnly 'net.luckperms:api:5.4'
     
     // Vault API
@@ -38,6 +38,9 @@ tasks.named('assemble') {
 tasks.named('compileJava') {
     options.encoding = 'UTF-8'
     options.release = 21
+    
+    // 非推奨APIの警告を表示
+    options.compilerArgs.add('-Xlint:deprecation')
 }
 
 tasks.named('processResources') {
@@ -51,4 +54,9 @@ tasks.named('processResources') {
     filesMatching('plugin.yml') {
         expand(props)
     }
+}
+
+tasks.named('reobfJar') {
+    // 出力JARファイルの名前を設定
+    outputJar.set(layout.buildDirectory.file("libs/RankSystemPlugin-${project.version}.jar"))
 }

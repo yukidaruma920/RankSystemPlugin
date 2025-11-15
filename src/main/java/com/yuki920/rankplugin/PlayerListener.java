@@ -68,7 +68,12 @@ public class PlayerListener implements Listener {
         // ノード（権限/グループ）が追加されたとき
         plugin.getLuckPerms().getEventBus().subscribe(NodeAddEvent.class, event -> {
             if (event.isUser()) {
-                UUID uuid = event.getTarget().getUniqueId();
+                UUID uuid;
+                if (event.getTarget() instanceof net.luckperms.api.model.user.User user) {
+                    uuid = user.getUniqueId();
+                } else {
+                    return;
+                }
                 Player player = Bukkit.getPlayer(uuid);
                 
                 if (player != null && player.isOnline()) {
@@ -82,7 +87,12 @@ public class PlayerListener implements Listener {
         // ノード（権限/グループ）が削除されたとき
         plugin.getLuckPerms().getEventBus().subscribe(NodeRemoveEvent.class, event -> {
             if (event.isUser()) {
-                UUID uuid = event.getTarget().getUniqueId();
+                UUID uuid;
+                if (event.getTarget() instanceof net.luckperms.api.model.user.User user) {
+                    uuid = user.getUniqueId();
+                } else {
+                    return;
+                }
                 Player player = Bukkit.getPlayer(uuid);
                 
                 if (player != null && player.isOnline()) {
