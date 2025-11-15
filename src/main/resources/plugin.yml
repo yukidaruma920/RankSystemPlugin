@@ -21,6 +21,24 @@ commands:
     permission: rank.gift
     permission-message: §c権限がありません。
   
+  giftaccept:
+    description: ギフトリクエストを受け取る
+    usage: /giftaccept
+    permission: rank.gift
+    permission-message: §c権限がありません。
+  
+  giftdeny:
+    description: ギフトリクエストを拒否
+    usage: /giftdeny
+    permission: rank.gift
+    permission-message: §c権限がありません。
+  
+  giftgui:
+    description: ギフトリクエストGUIを開く
+    usage: /giftgui
+    permission: rank.gift
+    permission-message: §c権限がありません。
+  
   rank:
     description: ランク関連コマンド
     usage: |

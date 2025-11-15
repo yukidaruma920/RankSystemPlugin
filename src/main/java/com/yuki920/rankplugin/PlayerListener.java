@@ -1,4 +1,4 @@
-package com.yuki920.rankplugin;
+package com.example.rankplugin;
 
 import net.luckperms.api.event.node.NodeAddEvent;
 import net.luckperms.api.event.node.NodeRemoveEvent;

@@ -1,4 +1,4 @@
-package com.yuki920.rankplugin;
+package com.example.rankplugin;
 
 import net.luckperms.api.LuckPerms;
 import net.milkbowl.vault.economy.Economy;
@@ -21,6 +21,7 @@ public class RankPlugin extends JavaPlugin implements Listener {
     private GiftGUI giftGUI;
     private DisplayManager displayManager;
     private PlayerListener playerListener;
+    private GiftRequestManager giftRequestManager;
     
     @Override
     public void onEnable() {
@@ -45,9 +46,10 @@ public class RankPlugin extends JavaPlugin implements Listener {
             economy = ecoProvider.getProvider();
             getLogger().info("Vaultとの連携に成功しました！");
         } else {
-            getLogger().severe("Vaultが見つかりません！");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
+            getLogger().warning("Vault経済プラグインが見つかりません！");
+            getLogger().warning("EssentialsXなどの経済プラグインをインストールしてください。");
+            getLogger().warning("経済機能なしで起動します。（ランク購入機能は無効）");
+            // economyがnullのままでも起動を続ける
         }
         
         // コンフィグの作成
@@ -59,6 +61,7 @@ public class RankPlugin extends JavaPlugin implements Listener {
         giftGUI = new GiftGUI(this, rankManager, economy);
         displayManager = new DisplayManager(this, luckPerms);
         playerListener = new PlayerListener(this, displayManager);
+        giftRequestManager = new GiftRequestManager(this);
         
         // イベントリスナー登録
         getServer().getPluginManager().registerEvents(this, this);
@@ -117,6 +120,25 @@ public class RankPlugin extends JavaPlugin implements Listener {
             return true;
         }
         
+        if (command.getName().equalsIgnoreCase("giftaccept")) {
+            giftRequestManager.acceptGift(player);
+            return true;
+        }
+        
+        if (command.getName().equalsIgnoreCase("giftdeny")) {
+            giftRequestManager.denyGift(player);
+            return true;
+        }
+        
+        if (command.getName().equalsIgnoreCase("giftgui")) {
+            if (!giftRequestManager.hasPendingRequest(player.getUniqueId())) {
+                player.sendMessage("§c受け取り待ちのギフトがありません。");
+                return true;
+            }
+            giftRequestManager.openGiftAcceptanceGUI(player);
+            return true;
+        }
+        
         if (command.getName().equalsIgnoreCase("rank")) {
             if (args.length == 0) {
                 rankManager.showRank(player, player);
@@ -157,5 +179,9 @@ public class RankPlugin extends JavaPlugin implements Listener {
     
     public DisplayManager getDisplayManager() {
         return displayManager;
+    }
+    
+    public GiftRequestManager getGiftRequestManager() {
+        return giftRequestManager;
     }
 }

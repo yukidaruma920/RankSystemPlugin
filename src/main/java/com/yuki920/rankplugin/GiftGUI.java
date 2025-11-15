@@ -1,4 +1,4 @@
-package com.yuki920.rankplugin;
+package com.example.rankplugin;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -31,6 +31,13 @@ public class GiftGUI implements Listener {
     }
     
     public void openGiftMenu(Player player) {
+        // 経済システムが利用できない場合
+        if (economy == null) {
+            player.sendMessage("§c経済システムが利用できません。");
+            player.sendMessage("§c管理者にEssentialsXなどの経済プラグインのインストールを依頼してください。");
+            return;
+        }
+        
         Inventory inv = Bukkit.createInventory(null, 27, "§b§lギフトメニュー");
         
         // オンラインプレイヤー一覧を表示
@@ -68,6 +75,12 @@ public class GiftGUI implements Listener {
     }
     
     public void openGiftRankMenu(Player player, Player target) {
+        // 経済システムが利用できない場合
+        if (economy == null) {
+            player.sendMessage("§c経済システムが利用できません。");
+            return;
+        }
+        
         Inventory inv = Bukkit.createInventory(null, 27, "§b§lギフトランク選択 - " + target.getName());
         
         giftTargets.put(player.getUniqueId(), target);

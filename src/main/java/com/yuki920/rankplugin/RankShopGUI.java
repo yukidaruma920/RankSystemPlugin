@@ -1,4 +1,4 @@
-package com.yuki920.rankplugin;
+package com.example.rankplugin;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -27,27 +27,40 @@ public class RankShopGUI implements Listener {
     }
     
     public void openShop(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 27, "§6§lランクショップ");
-        
-        int slot = 10;
-        for (RankManager.RankInfo rank : rankManager.getRanks().values()) {
-            ItemStack item = createRankItem(rank);
-            inv.setItem(slot, item);
-            slot++;
-            if (slot == 17) slot = 19;
+        // 経済システムが利用できない場合
+        if (economy == null) {
+            player.sendMessage("§c経済システムが利用できません。");
+            player.sendMessage("§c管理者にEssentialsXなどの経済プラグインのインストールを依頼してください。");
+            return;
         }
         
-        // 閉じるボタン
+        Inventory inv = Bukkit.createInventory(null, 27, "§6§lランクショップ");
+        
+        // ランクをTier順にソート
+        List<RankManager.RankInfo> sortedRanks = new ArrayList<>(rankManager.getRanks().values());
+        sortedRanks.sort(Comparator.comparingInt(RankManager.RankInfo::getTier));
+        
+        int slot = 10;
+        for (RankManager.RankInfo rank : sortedRanks) {
+            if (slot >= 17) slot = 19; // 2列目に移動
+            if (slot >= 26) break; // スペース不足
+            
+            ItemStack item = createRankItem(rank, player);
+            inv.setItem(slot, item);
+            slot++;
+        }
+        
+        // 閉じるボタン（3列目中央 = スロット22）
         ItemStack closeItem = new ItemStack(Material.BARRIER);
         ItemMeta closeMeta = closeItem.getItemMeta();
         closeMeta.setDisplayName("§c閉じる");
         closeItem.setItemMeta(closeMeta);
-        inv.setItem(26, closeItem);
+        inv.setItem(22, closeItem);
         
         player.openInventory(inv);
     }
     
-    private ItemStack createRankItem(RankManager.RankInfo rank) {
+    private ItemStack createRankItem(RankManager.RankInfo rank, Player viewer) {
         ItemStack item = new ItemStack(Material.DIAMOND);
         ItemMeta meta = item.getItemMeta();
         
@@ -60,37 +73,22 @@ public class RankShopGUI implements Listener {
         lore.add("§e通常価格: §a$" + String.format("%.2f", rank.getPrice()));
         lore.add("§7");
         
-        // プレイヤーの現在のランクをチェック
-        Player viewer = null;
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (p.getOpenInventory().getTitle().equals("§6§lランクショップ")) {
-                viewer = p;
-                break;
-            }
-        }
+        RankManager.UpgradeInfo upgradeInfo = rankManager.checkUpgrade(viewer, rank);
         
-        if (viewer != null) {
-            RankManager.UpgradeInfo upgradeInfo = rankManager.checkUpgrade(viewer, rank);
-            
-            if (!upgradeInfo.canUpgrade()) {
-                lore.add("§c✗ 購入不可（同等以下のランクを所持）");
-                lore.add("§7");
-            } else if (upgradeInfo.isUpgrade()) {
-                lore.add("§b§l⬆ アップグレード可能！");
-                lore.add("§7現在: §e" + upgradeInfo.getCurrentRank().getDisplayName());
-                lore.add("§aアップグレード費用: §2$" + String.format("%.2f", upgradeInfo.getUpgradeCost()));
-                lore.add("§7(通常 §7$" + String.format("%.2f", rank.getPrice()) + "§7)");
-                lore.add("§7");
-                lore.add("§e左クリック: §a差額でアップグレード");
-                lore.add("§eShift+左クリック: §bギフト用に購入");
-                lore.add("§7");
-            } else {
-                lore.add("§e左クリック: §a購入");
-                lore.add("§eShift+左クリック: §bギフト用に購入");
-                lore.add("§7");
-            }
+        if (!upgradeInfo.canUpgrade()) {
+            lore.add("§c✗ 購入不可（同等以下のランクを所持）");
+            lore.add("§7");
+        } else if (upgradeInfo.isUpgrade()) {
+            lore.add("§b§l⬆ アップグレード可能！");
+            lore.add("§7現在: §e" + upgradeInfo.getCurrentRank().getDisplayName());
+            lore.add("§aアップグレード費用: §2$" + String.format("%.2f", upgradeInfo.getUpgradeCost()));
+            lore.add("§7(通常 §7$" + String.format("%.2f", rank.getPrice()) + "§7)");
+            lore.add("§7");
+            lore.add("§e左クリック: §a差額でアップグレード");
+            lore.add("§eShift+左クリック: §bギフト用に購入");
+            lore.add("§7");
         } else {
-            lore.add("§e左クリック: §a自分用に購入");
+            lore.add("§e左クリック: §a購入");
             lore.add("§eShift+左クリック: §bギフト用に購入");
             lore.add("§7");
         }

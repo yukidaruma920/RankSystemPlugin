@@ -1,4 +1,4 @@
-package com.yuki920.rankplugin;
+package com.example.rankplugin;
 
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
@@ -154,21 +154,38 @@ public class RankManager {
             
             luckPerms.getUserManager().saveUser(user);
             
-            // 表示を更新
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (target.isOnline()) {
-                    plugin.getDisplayManager().updatePlayerDisplay(target);
-                }
-            }, 10L);
+            // LuckPermsのキャッシュを強制更新
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                // ユーザーデータを再読み込み
+                luckPerms.getUserManager().loadUser(target.getUniqueId()).thenAccept(updatedUser -> {
+                    if (updatedUser != null && target.isOnline()) {
+                        // 少し遅延させて表示を更新
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                            plugin.getDisplayManager().updatePlayerDisplay(target);
+                            
+                            // 全プレイヤーに対して更新を通知（他のプレイヤーから見える名前も更新）
+                            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                                if (!onlinePlayer.equals(target)) {
+                                    // 他のプレイヤーのクライアントにも更新を送信
+                                    onlinePlayer.hidePlayer(plugin, target);
+                                    onlinePlayer.showPlayer(plugin, target);
+                                }
+                            }
+                        }, 20L); // 1秒後
+                    }
+                });
+            });
             
             // 通知メッセージ
-            if (gifter != null) {
-                target.sendMessage("§e§l[!] §a" + gifter.getName() + " §7から §6" + 
-                    rankInfo.getDisplayName() + " §7ランクをギフトされました！");
-            } else {
-                target.sendMessage("§e§l[!] §6" + rankInfo.getDisplayName() + 
-                    " §7ランクを購入しました！");
-            }
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (gifter != null) {
+                    target.sendMessage("§e§l[!] §a" + gifter.getName() + " §7から §6" + 
+                        rankInfo.getDisplayName() + " §7ランクをギフトされました！");
+                } else {
+                    target.sendMessage("§e§l[!] §6" + rankInfo.getDisplayName() + 
+                        " §7ランクを購入しました！");
+                }
+            });
             
             return true;
         }).exceptionally(throwable -> {

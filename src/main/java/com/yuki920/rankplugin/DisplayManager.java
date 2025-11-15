@@ -1,4 +1,4 @@
-package com.yuki920.rankplugin;
+package com.example.rankplugin;
 
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
@@ -34,18 +34,40 @@ public class DisplayManager {
         prefix = prefix != null ? ChatColor.translateAlternateColorCodes('&', prefix) : "";
         suffix = suffix != null ? ChatColor.translateAlternateColorCodes('&', suffix) : "";
         
+        // プレフィックスから最後の色コードを抽出してプレイヤー名に適用
+        String nameColor = extractLastColorCode(prefix);
+        
         // TABリストの表示名を設定
-        String displayName = prefix + player.getName() + suffix;
+        String displayName = prefix + nameColor + player.getName() + suffix;
         player.setPlayerListName(displayName);
         
         // スコアボードチームの設定（ネームタグ用）
-        updateTeam(player, prefix, suffix);
+        updateTeam(player, prefix, suffix, nameColor);
+    }
+    
+    /**
+     * 文字列から最後の色コードを抽出
+     */
+    private String extractLastColorCode(String text) {
+        if (text == null || text.isEmpty()) return "§f";
+        
+        String lastColor = "§f"; // デフォルトは白
+        for (int i = 0; i < text.length() - 1; i++) {
+            if (text.charAt(i) == '§' || text.charAt(i) == '&') {
+                char code = text.charAt(i + 1);
+                // 色コードまたはフォーマットコード
+                if ("0123456789abcdefklmnor".indexOf(Character.toLowerCase(code)) != -1) {
+                    lastColor = "§" + code;
+                }
+            }
+        }
+        return lastColor;
     }
     
     /**
      * スコアボードチームを使ってネームタグを設定
      */
-    private void updateTeam(Player player, String prefix, String suffix) {
+    private void updateTeam(Player player, String prefix, String suffix, String nameColor) {
         String teamName = getTeamName(player);
         Team team = scoreboard.getTeam(teamName);
         
@@ -54,9 +76,18 @@ public class DisplayManager {
             team = scoreboard.registerNewTeam(teamName);
         }
         
-        // プレフィックスとサフィックスを設定
+        // プレフィックスとサフィックスを設定（名前の色も含める）
         team.setPrefix(prefix);
         team.setSuffix(suffix);
+        
+        // プレイヤー名の色を設定
+        try {
+            // Paperの新しいAPI（1.13+）
+            team.setColor(getChatColorFromCode(nameColor));
+        } catch (Exception e) {
+            // フォールバック: Prefixに名前の色を含める
+            team.setPrefix(prefix + nameColor);
+        }
         
         // プレイヤーをチームに追加
         if (!team.hasEntry(player.getName())) {
@@ -65,6 +96,34 @@ public class DisplayManager {
         
         // ネームタグの表示設定
         team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
+    }
+    
+    /**
+     * カラーコードからChatColorを取得
+     */
+    private ChatColor getChatColorFromCode(String colorCode) {
+        if (colorCode == null || colorCode.length() < 2) return ChatColor.WHITE;
+        
+        char code = colorCode.charAt(1);
+        return switch (Character.toLowerCase(code)) {
+            case '0' -> ChatColor.BLACK;
+            case '1' -> ChatColor.DARK_BLUE;
+            case '2' -> ChatColor.DARK_GREEN;
+            case '3' -> ChatColor.DARK_AQUA;
+            case '4' -> ChatColor.DARK_RED;
+            case '5' -> ChatColor.DARK_PURPLE;
+            case '6' -> ChatColor.GOLD;
+            case '7' -> ChatColor.GRAY;
+            case '8' -> ChatColor.DARK_GRAY;
+            case '9' -> ChatColor.BLUE;
+            case 'a' -> ChatColor.GREEN;
+            case 'b' -> ChatColor.AQUA;
+            case 'c' -> ChatColor.RED;
+            case 'd' -> ChatColor.LIGHT_PURPLE;
+            case 'e' -> ChatColor.YELLOW;
+            case 'f' -> ChatColor.WHITE;
+            default -> ChatColor.WHITE;
+        };
     }
     
     /**
@@ -106,16 +165,14 @@ public class DisplayManager {
         return switch (groupName.toLowerCase()) {
             case "owner" -> 1;
             case "admin" -> 2;
-            case "mod+", "moderator+" -> 3;
-            case "mod", "moderator" -> 4;
-            case "dev", "developer" -> 5;
-            case "build","builder" -> 6;
-            case "yt", "youtube" -> 10;
-            case "mvp++", "mvp_plus_plus" -> 20;
-            case "mvp+", "mvp_plus" -> 21;
-            case "mvp" -> 22;
-            case "vip+", "vip_plus" -> 23;
-            case "vip" -> 24;
+            case "mod", "moderator" -> 3;
+            case "helper" -> 4;
+            case "mvpplusplus" -> 10;
+            case "mvpplus" -> 11;
+            case "mvp" -> 12;
+            case "vipplus" -> 13;
+            case "vip" -> 14;
+            case "member" -> 50;
             default -> 999;
         };
     }
@@ -147,5 +204,4 @@ public class DisplayManager {
             }
         }
     }
-
 }
