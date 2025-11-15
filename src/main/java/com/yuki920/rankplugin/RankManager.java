@@ -136,14 +136,17 @@ public class RankManager {
             // 既存の下位ランクを削除
             removeAllRanks(user);
             
-            Node.Builder nodeBuilder = Node.builder("group." + rankInfo.getGroupName());
-            
+            // 新しいノードを作成
+            Node node;
             if (rankInfo.getDuration() > 0) {
                 Duration duration = Duration.ofDays(rankInfo.getDuration());
-                nodeBuilder.expiry(duration);
+                node = Node.builder("group." + rankInfo.getGroupName())
+                    .expiry(duration)
+                    .build();
+            } else {
+                node = Node.builder("group." + rankInfo.getGroupName()).build();
             }
             
-            Node node = nodeBuilder.build();
             user.data().add(node);
             
             // プライマリグループを設定
