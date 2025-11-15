@@ -1,0 +1,44 @@
+name: RankPlugin
+version: 1.0.0
+main: com.yuki920.rankplugin.RankPlugin
+api-version: 1.21
+depend: [LuckPerms, Vault]
+author: YourName
+description: LuckPerms・Vault連携のRank管理プラグイン
+
+commands:
+  rankshop:
+    description: ランクショップを開く
+    usage: /rankshop
+    permission: rank.shop
+    permission-message: §c権限がありません。
+  
+  gift:
+    description: ランクをギフトする
+    usage: |
+      /gift - ギフトメニューを開く
+      /gift <プレイヤー> - 指定プレイヤーへのギフトメニューを開く
+    permission: rank.gift
+    permission-message: §c権限がありません。
+  
+  rank:
+    description: ランク関連コマンド
+    usage: |
+      /rank - 自分のランクを表示
+      /rank check <プレイヤー> - 他プレイヤーのランクを確認
+    permission: rank.use
+    permission-message: §c権限がありません。
+
+permissions:
+  rank.use:
+    description: ランクコマンドの基本使用権限
+    default: true
+  rank.shop:
+    description: ランクショップの使用権限
+    default: true
+  rank.gift:
+    description: ランクをギフトする権限
+    default: true
+  rank.check:
+    description: 他プレイヤーのランクを確認
+    default: op

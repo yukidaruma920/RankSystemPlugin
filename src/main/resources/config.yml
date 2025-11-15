@@ -1,0 +1,62 @@
+# RankPlugin 設定ファイル
+
+# ランク定義（アップグレード形式）
+# key: 内部識別名
+# group: LuckPermsのグループ名
+# price: 価格（Vault経済）
+# duration: 期間（日数）-1で永久
+# display-name: 表示名
+# tier: ランクの階層（数字が大きいほど上位）
+
+ranks:
+  vip:
+    group: "vip"
+    price: 1000.0
+    duration: -1
+    display-name: "VIP"
+    tier: 1
+  
+  vip_plus:
+    group: "vip+"
+    price: 2000.0
+    duration: -1
+    display-name: "VIP+"
+    tier: 2
+  
+  mvp:
+    group: "mvp"
+    price: 4000.0
+    duration: -1
+    display-name: "MVP"
+    tier: 3
+  
+  mvp_plus:
+    group: "mvp+"
+    price: 7000.0
+    duration: -1
+    display-name: "MVP+"
+    tier: 4
+  
+  mvp_plus_plus:
+    group: "mvp++"
+    price: 12000.0
+    duration: 30
+    display-name: "MVP++"
+    tier: 5
+
+# グループの優先度設定（TABリストの並び順）
+# 数字が小さいほど上位に表示される
+group-priorities:
+  owner: 1
+  admin: 2
+  moderator_plus: 3
+  moderator: 4
+  developer: 5
+  builder: 6
+  youtuber: 10
+  mvp_plus_plus: 20
+  mvp_plus: 21
+  mvp: 22
+  vip_plus: 23
+  vip: 24
+  default: 999
