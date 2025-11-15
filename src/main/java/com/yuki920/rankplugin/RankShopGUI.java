@@ -1,4 +1,4 @@
-package com.example.rankplugin;
+package com.yuki920.rankplugin;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
