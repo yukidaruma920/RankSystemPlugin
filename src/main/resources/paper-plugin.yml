@@ -1,0 +1,6 @@
+name: MyPlugin
+version: 1.0-SNAPSHOT
+main: com.example.myplugin.MyPlugin
+apiversion: '1.21'
+author: YourName
+description: A simple PaperMC plugin.
