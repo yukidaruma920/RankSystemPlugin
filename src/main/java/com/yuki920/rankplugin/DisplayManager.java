@@ -114,7 +114,7 @@ public class DisplayManager {
             case "mvp++", "mvp_plus_plus" -> 20;
             case "mvp+", "mvp_plus" -> 21;
             case "mvp" -> 22;
-            case "vip+", "vip_plus" -> 23
+            case "vip+", "vip_plus" -> 23;
             case "vip" -> 24;
             default -> 999;
         };
@@ -147,4 +147,5 @@ public class DisplayManager {
             }
         }
     }
+
 }
