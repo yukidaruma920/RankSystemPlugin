@@ -38,21 +38,17 @@ tasks.named('assemble') {
 tasks.named('compileJava') {
     options.encoding = 'UTF-8'
     options.release = 21
-    
-    // 非推奨APIの警告を表示
-    options.compilerArgs.add('-Xlint:deprecation')
 }
 
 tasks.named('processResources') {
     filteringCharset = 'UTF-8'
-    def props = [
-        'version': project.version,
-        'description': project.description,
-        'apiVersion': '1.21'
-    ]
-    inputs.properties(props)
+    
+    // api-versionを文字列として展開
     filesMatching('plugin.yml') {
-        expand(props)
+        expand(
+            'version': project.version,
+            'description': project.description
+        )
     }
 }
 

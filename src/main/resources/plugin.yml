@@ -1,9 +1,9 @@
 name: RankPlugin
 version: 1.0.0
 main: com.yuki920.rankplugin.RankPlugin
-api-version: 1.21
+api-version: "1.21"
 depend: [LuckPerms, Vault]
-author: yuki920
+author: YourName
 description: LuckPerms・Vault連携のRank管理プラグイン
 
 commands:
@@ -41,5 +41,4 @@ permissions:
     default: true
   rank.check:
     description: 他プレイヤーのランクを確認
-
     default: op
